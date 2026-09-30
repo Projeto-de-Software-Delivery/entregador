@@ -66,6 +66,6 @@ jobs:
               --name delivery-entregador \
               --restart unless-stopped \
               --network delivery-network \
-              -p 8000:8000 \
+              -p 8081:8000 \
               -e DATABASE_URL="$DATABASE_URL" \
               $DOCKERHUB_USERNAME/delivery-entregador:$IMAGE_TAG
