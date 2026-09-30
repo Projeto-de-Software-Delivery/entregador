@@ -1,0 +1,223 @@
+{
+  "info": {
+    "_postman_id": "7f13e6c8-0a5c-4bb9-a0c5-delivery-entregador",
+    "name": "Delivery - Serviço Entregador",
+    "description": "Collection para testar o microsserviço de Entregador em FastAPI.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "entregadorId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Entregadores",
+      "item": [
+        {
+          "name": "Criar entregador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('entregadorId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Erick\",\n  \"veiculo\": \"MOTO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entregadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar entregadores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entregadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar entregador por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entregadores/{{entregadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores",
+                "{{entregadorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Atualizar entregador",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Erick Oliveira\",\n  \"veiculo\": \"CARRO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entregadores/{{entregadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores",
+                "{{entregadorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Atualizar status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INDISPONIVEL\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entregadores/{{entregadorId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores",
+                "{{entregadorId}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Excluir entregador",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entregadores/{{entregadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores",
+                "{{entregadorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar ID inexistente - 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entregadores/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar com payload inválido - 422",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"veiculo\": \"AVIAO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entregadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "entregadores"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
