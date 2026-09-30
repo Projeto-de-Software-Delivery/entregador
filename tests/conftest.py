@@ -51,3 +51,4 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
     with TestClient(application) as test_client:
         yield test_client
     application.dependency_overrides.clear()
+
