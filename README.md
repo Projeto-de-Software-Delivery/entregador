@@ -26,9 +26,10 @@ app/
   repositories/    acesso a dados
   services/        regras de caso de uso
   routers/         endpoints HTTP
+  messaging/       consumidor RabbitMQ dos eventos de pedido
 tests/
-  unit/            testes do service
-  integration/     testes de API
+  unit/            testes do service, handler e consumidor
+  integration/     testes de API e de eventos com RabbitMQ real
 alembic/           migrations
 ```
 
@@ -96,8 +97,32 @@ e PostgreSQL.
 - `DELETE /entregadores/{id}`
 - `PATCH /entregadores/{id}/status`
 
+## Eventos (RabbitMQ)
+
+Alem da API HTTP (chamada de forma sincrona pelo `pedidos-lojas`), o servico
+consome de forma assincrona os eventos que o `pedidos-lojas` publica no exchange
+topic `pedidos`, numa fila propria (`entregador.pedidos`):
+
+| Routing key | Efeito no entregador (`data.entregadorId`) |
+|---|---|
+| `entrega.aceita` | passa para `EM_ENTREGA` |
+| `pedido.entregue` | volta para `DISPONIVEL` |
+
+- Mensagem malformada e descartada (reject sem requeue) e logada; falha
+  inesperada (ex.: banco fora) volta para a fila.
+- Aplicar o mesmo evento duas vezes nao muda nada (idempotente).
+- O consumidor roda numa thread junto da API e reconecta sozinho se o broker cair.
+
+| Variavel | Padrao | Descricao |
+|---|---|---|
+| `RABBITMQ_URL` | *(vazio)* | URL AMQP, ex.: `amqp://guest:guest@rabbitmq:5672/%2F`. Vazio desliga o consumidor. |
+| `RABBITMQ_EXCHANGE` | `pedidos` | Exchange topic dos eventos de pedido. |
+| `RABBITMQ_QUEUE` | `entregador.pedidos` | Fila deste servico. |
+
+No CI, `RABBITMQ_TEST_URL` aponta para um RabbitMQ de verdade e liga o teste de
+integracao `tests/integration/test_eventos_rabbitmq.py` (sem a variavel, ele e pulado).
+
 ## Escopo atual
 
-Esta primeira versao implementa apenas CRUD de entregadores e alteracao de
-status. RabbitMQ, notificacoes, Auth0, tracking, corrida e mapas ficaram fora do
-escopo de proposito.
+CRUD de entregadores, alteracao de status (HTTP) e consumo dos eventos de pedido
+(RabbitMQ). Auth0 (validado no gateway), tracking e mapas ficaram fora do escopo.

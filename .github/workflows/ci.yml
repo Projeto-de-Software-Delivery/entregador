@@ -10,8 +10,18 @@ jobs:
     name: Lint and tests
     runs-on: ubuntu-latest
 
+    # RabbitMQ de verdade para o teste de integração dos eventos (tests/integration/test_eventos_rabbitmq.py).
+    services:
+      rabbitmq:
+        image: rabbitmq:3-alpine
+        ports: ["5672:5672"]
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+
     env:
       DATABASE_URL: "sqlite+pysqlite:///:memory:"
+      RABBITMQ_TEST_URL: "amqp://guest:guest@localhost:5672/%2F"
 
     steps:
       - name: Checkout
