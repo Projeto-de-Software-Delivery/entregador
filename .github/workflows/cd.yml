@@ -40,6 +40,8 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Opcional: sem o secret, o consumidor de eventos fica desligado e só a API HTTP roda.
+          RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
 
@@ -48,7 +50,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.KEY_TEST }}
           port: 22
-          envs: DATABASE_URL,DOCKERHUB_USERNAME,IMAGE_TAG
+          envs: DATABASE_URL,RABBITMQ_URL,DOCKERHUB_USERNAME,IMAGE_TAG
 
           script: |
             docker pull $DOCKERHUB_USERNAME/delivery-entregador:$IMAGE_TAG
@@ -68,4 +70,5 @@ jobs:
               --network delivery-network \
               -p 8081:8000 \
               -e DATABASE_URL="$DATABASE_URL" \
+              -e RABBITMQ_URL="$RABBITMQ_URL" \
               $DOCKERHUB_USERNAME/delivery-entregador:$IMAGE_TAG
